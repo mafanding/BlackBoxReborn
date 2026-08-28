@@ -1,4 +1,4 @@
-﻿name: Release
+name: Release
 
 on:
   push:
@@ -24,15 +24,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Decode keystore
-        run: printf '%s' "${{ secrets.KEYSTORE_B64 }}" | base64 -d > blackboxreborn.jks
-
-      - name: Build signed release APK
-        env:
-          KEYSTORE_PATH: ${{ github.workspace }}/blackboxreborn.jks
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      - name: Build release APK (debug-signed)
         run: ./gradlew :app:assembleRelease --no-daemon
 
       - name: Get version from tag
@@ -50,9 +42,7 @@ jobs:
         with:
           name: BlackBox Reborn ${{ steps.version.outputs.VERSION }}
           body: |
-            See [CHANGELOG.md](https://github.com/fdavids77/BlackBoxReborn/blob/main/CHANGELOG.md) for what changed.
+            See [CHANGELOG.md](https://github.com/mafanding/BlackBoxReborn/blob/main/CHANGELOG.md) for what changed.
 
             **Fixes included:** PackageParserFix · ArtMethodFix · GMS signature passthrough · NativeCore UID spoof
           files: app/build/outputs/apk/release/BlackBoxReborn-${{ steps.version.outputs.VERSION }}.apk
-
-
